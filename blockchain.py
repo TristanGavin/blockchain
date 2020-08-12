@@ -103,9 +103,31 @@ class Blockchain(object):
         return self.chain[-1]
 
     ### CODE FOR FLASK SERVER ###
+    #we want a way to mine new blocks, post new transactions and get the full blockchain.
 
     # Instantiate the node 
-    app = Flask(__name__):
+    app = Flask(__name__)
+
+    # Generate a globally unique name for this node
+    node_identifier = str(uuid4()).replace('-', '')
+
+    # Instantiate the blockchain
+    blockchain = Blockchain()
+    
+    #define the HTTP operations that can be performed.
+    @app.route('/mine', methods=['GET'])
+    def mine():
+        return "we will mine a new block"
+
+    @app.route('/transactions/new', methods=['POST'])
+    def new_transaction():
+        return "add a new transaction"
+
+    @app.route('/chain', methods=['GET'])
+    def chain():
+        return "return the entire blockchain"
+    
+
 
 
         
