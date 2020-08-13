@@ -102,30 +102,58 @@ class Blockchain(object):
         #returns last block in chain
         return self.chain[-1]
 
-    ### CODE FOR FLASK SERVER ###
-    #we want a way to mine new blocks, post new transactions and get the full blockchain.
+### CODE FOR FLASK SERVER ###
+#we want a way to mine new blocks, post new transactions and get the full blockchain.
 
-    # Instantiate the node 
-    app = Flask(__name__)
+# Instantiate the node 
+app = Flask(__name__)
 
-    # Generate a globally unique name for this node
-    node_identifier = str(uuid4()).replace('-', '')
+# Generate a globally unique name for this node
+node_identifier = str(uuid4()).replace('-', '')
 
-    # Instantiate the blockchain
-    blockchain = Blockchain()
+# Instantiate the blockchain
+blockchain = Blockchain()
+
+# define the HTTP operations that can be performed.
+# route() tells flask what url triggers our function
+@app.route('/mine', methods=['GET'])
+def mine():
+    # mine method must calculate proof of work, reward miner with 1 coin, add the new block to the chain.
+    return "we will mine a new block"
+
+# POST request since we are sending data
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    values = request.get_json()
+
+    # check all values in post data are present.
+    required = ['sender', 'recipient', 'amount']
+    if not all(k in values for k in required): # loop through required and ensure all values are there
+        return 'Missing Values', 300           # if not there return 300 error. 
+
+    # create new transaction
+    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
     
-    #define the HTTP operations that can be performed.
-    @app.route('/mine', methods=['GET'])
-    def mine():
-        return "we will mine a new block"
+    response = {'message': f'Transaction will be added to block {index}'}
+    return jsonify(response), 201
 
-    @app.route('/transactions/new', methods=['POST'])
-    def new_transaction():
-        return "add a new transaction"
 
-    @app.route('/chain', methods=['GET'])
-    def chain():
-        return "return the entire blockchain"
+@app.route('/chain', methods=['GET'])
+def chain():
+    response = {
+        'chain' = blockchain.chain,
+        'length'= len(blockchain.chain),
+    }
+
+    return jsonify(response), 200
+
+# run server of port 5000
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+
+
+    
     
 
 
