@@ -1,3 +1,23 @@
+# Blockchain Code
+# by Tistan Gavin
+# Borrowed heavily from: https://hackernoon.com/learn-blockchains-by-building-one-117428612f46 
+# Learn Blockchains by Building one
+# 
+# Thoughts:
+# Have a much better comprehension of how blockchains and crypto currency works. Each block is linked together
+# by a unique discovered hash code that turns the first x amount of numbers into zeros. Changing one message would
+# break the code all the way down. It is computationally expensive for codes to be found and miners are rewarded
+# with currency for finding them and adding a block to the chain. 
+#
+# Complications:
+# Ran into an issue with my server side new_transaction function. Kept getting a HTTP 500 error.
+#
+# TODO:
+# Fix new_transaction.
+# Finish decentralizing the chain so that everyone has a copy
+# going to work on a different project for now.
+
+
 import hashlib
 import json
 
@@ -151,16 +171,17 @@ def mine():
 def new_transaction():
     values = request.get_json()
 
-    # check all values in post data are present.
+    # Check that the required fields are in the POST'ed data
     required = ['sender', 'recipient', 'amount']
-    if not all(k in values for k in required): # loop through required and ensure all values are there
-        return 'Missing Values', 300           # if not there return 300 error. 
+    if not all(k in values for k in required):
+        return 'Missing values', 400
 
-    # create new transaction
+    # Create a new Transaction
     index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
-    
-    response = {'message': f'Transaction will be added to block {index}'}
+
+    response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
+    
 
 
 @app.route('/chain', methods=['GET'])
@@ -175,6 +196,7 @@ def chain():
 # run server of port 5000
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
